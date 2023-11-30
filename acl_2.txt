@@ -1,0 +1,125 @@
+ ACL is of two kinds
+1. Standard : Can only filter/restrict source ip addresses
+2. Extended : Can only filter/restrict source and destination ip addresses
+
+For standard ACL, ACL must be applied closest to the destination
+
+
+#rules create on a device
+Router>en
+Router#conf t
+Enter configuration commands, one per line.  End with CNTL/Z.
+Router(config)#ip access-list standard 1
+Router(config-std-nacl)#deny 10.0.0.20 0.0.0.0
+Router(config-std-nacl)#permit any
+Router(config-std-nacl)#end
+Router#
+%SYS-5-CONFIG_I: Configured from console by console
+
+Router#show access-lists
+Standard IP access list 1
+    10 deny host 10.0.0.20
+    20 permit any
+
+
+
+
+#router interface e rules apply
+Router#conf t
+Enter configuration commands, one per line.  End with CNTL/Z.
+Router(config)#int gig0/0
+Router(config-if)#ip access-group 1 out  --- apply
+Router(config-if)#no ip access-group 1 out  ---unapply
+
+
+
+#remove a rule
+Router#conf t
+Enter configuration commands, one per line.  End with CNTL/Z.
+Router(config)#ip access-list standard 1
+Router(config-std-nacl)#no 10
+Router(config-std-nacl)#end
+Router#
+%SYS-5-CONFIG_I: Configured from console by console
+
+Router#show access-lists
+Standard IP access list 1
+    20 permit any (2 match(es))
+
+
+#add a rule
+Router#conf t
+Enter configuration commands, one per line.  End with CNTL/Z.
+Router(config)#ip access-list standard 1
+Router(config-std-nacl)#no 20
+Router(config-std-nacl)#deny 10.0.0.10 0.0.0.0
+Router(config-std-nacl)#permit any
+Router(config-std-nacl)#end
+Router#
+%SYS-5-CONFIG_I: Configured from console by console
+
+Router#show access-lists
+Standard IP access list 1
+    10 deny host 10.0.0.10
+    20 permit any
+
+
+#modify a rule
+Router#conf t
+Enter configuration commands, one per line.  End with CNTL/Z.
+Router(config)#ip access-group 1 out
+                         ^
+% Invalid input detected at '^' marker.
+	
+Router(config)#int gig0/0
+Router(config-if)#ip access-group 1 out
+Router(config-if)#ip access-list standard 1
+Router(config-std-nacl)#no 10
+Router(config-std-nacl)#10 deny 10.0.0.20 0.0.0.0
+Router(config-std-nacl)#permit any
+Router(config-std-nacl)#end
+Router#
+%SYS-5-CONFIG_I: Configured from console by console
+
+Router#show access-lists
+Standard IP access list 1
+    10 deny host 10.0.0.20
+    20 permit any
+
+
+
+#apply rules on subnet
+Router(config)#ip access-list standard 2
+Router(config-std-nacl)#deny 10.0.0.0 0.255.255.255
+Router(config-std-nacl)#permit any
+
+
+#rules apply
+Router(config)#int gig0/0
+Router(config-if)#no ip access-group 1 out  --- unapply
+Router(config-if)#ip access-group 2 out   ---- apply
+Router(config-if)#end
+Router#
+%SYS-5-CONFIG_I: Configured from console by console
+
+Router#show access-lists
+Standard IP access list 1
+    10 deny host 10.0.0.20
+    20 permit any
+Standard IP access list 2
+    10 deny 10.0.0.0 0.255.255.255
+    20 permit any
+
+
+#delete a rule
+Router#conf t
+Enter configuration commands, one per line.  End with CNTL/Z.
+Router(config)#no ip access-list standard 1
+Router(config)#ex
+Router#
+%SYS-5-CONFIG_I: Configured from console by console
+
+Router#show access-lists
+Standard IP access list 2
+    10 deny 10.0.0.0 0.255.255.255 (4 match(es))
+    20 permit any

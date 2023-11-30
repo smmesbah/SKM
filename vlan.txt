@@ -1,0 +1,93 @@
+#assign vlan
+en ---- privileged mode
+show vlan brief
+conf t  --- global privileged mode
+vlan 10
+name vlan_name(ex: HR,Accounts)
+vlan 20
+name vlan_name
+end  --- now in privileged mode
+
+
+
+
+#vlan interface
+conf t  --- if it is not in global pv mode
+int range fa0/1-2
+switchport access vlan 10
+int range fa0/3-4
+switchport access vlan 20
+end
+
+
+
+
+#interface gulo by default dynamic akare thake etake static access kore nite hobe
+show int switchport
+conf t
+int range fa0/1-4
+switchport mode access
+end
+
+
+
+
+#trunking ( switch-switch, switch-router )
+show int trunk
+conf t
+int fa0/5
+switchport mode trunk
+end
+(ekta switch er end theke trunking korle automatic onno switch er end e enable hoye jay)
+
+(switch-router er khetre trunking korar time e router er interface ke on korte hoy)
+in switch port:
+int fa0/6
+switchport mode trunk
+in router:
+en
+conf t
+int gig0/0/0
+no shutdown  --- interface on
+
+
+
+
+
+# ekta router interface e 2 ta ip address assign er jonno encapsulation VLAN:
+conf t
+int gig0/0/0.1
+encapsulation dot1q 10
+ip add default_gateway subnet_mask
+ex
+int gig0/0/0.2
+enacapsulation dot1q 20
+ip add default_gateway subnet_mask
+
+end
+show ip int brief  --- vlan encapsulation dekhar jonno
+
+
+
+
+----------------------------------------------------------------------------------------------------------------------------
+#vlan details
+show vlan brief
+
+#create vlan
+conf t
+vlan 100
+name administration
+
+#assign interface
+conf t
+int range fa0/1-2
+switchport access vlan 100
+
+#modify range in vlan
+int range fa0/2
+switchport access vlan 1  --- 1 means default
+
+#delete a vlan
+no vlan 100
+(vlan delete korle auto er shathe interface gulo delete hoye jay.. tai age reassign kore nite hobe)
